@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Où êtes-vous ? Puzzle topographique</title>
+<meta name="description" content="Une vue du paysage, une carte en courbes de niveau : retrouvez l'endroit d'où la vue a été prise.">
+<meta name="theme-color" content="#eaeee8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141b19" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<!-- Aperçu du lien sur les réseaux : remplacez l'adresse de l'image par son URL complète (voir README) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Où êtes-vous ? Puzzle topographique">
+<meta property="og:description" content="Une vue du paysage, une carte en courbes de niveau : retrouvez l'endroit d'où la vue a été prise.">
+<meta property="og:image" content="assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ Accueil ============ -->
+<section id="setup" class="wrap setup">
+  <div class="hero-map"><svg id="heroMap" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+  <div class="setup-text">
+    <h1>Où êtes&#8209;vous&nbsp;?</h1>
+    <p class="lede">Une vue du paysage, une carte en courbes de niveau. Trouvez l'endroit depuis lequel la vue a été prise.</p>
+
+    <div class="settings">
+      <h2 class="group">La partie</h2>
+      <div class="field">
+        <div class="field-head"><label for="levels">Nombre de niveaux</label><output id="levelsOut" for="levels">5</output></div>
+        <input type="range" id="levels" min="1" max="30" value="5">
+      </div>
+
+      <fieldset class="field">
+        <legend>Réponse</legend>
+        <div class="seg">
+          <label><input type="radio" name="mode" value="points" checked><span>Parmi des points</span></label>
+          <label><input type="radio" name="mode" value="libre"><span>Clic libre</span></label>
+        </div>
+        <p class="hint" id="modeHint"></p>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Difficulté</legend>
+        <div class="seg">
+          <label><input type="radio" name="diff" value="progressif" checked><span>Progressive</span></label>
+          <label><input type="radio" name="diff" value="facile"><span>Facile</span></label>
+          <label><input type="radio" name="diff" value="normal"><span>Normale</span></label>
+          <label><input type="radio" name="diff" value="difficile"><span>Difficile</span></label>
+          <label><input type="radio" name="diff" value="extreme"><span>Extrême</span></label>
+        </div>
+        <p class="hint" id="diffHint"></p>
+      </fieldset>
+
+      <h2 class="group">Le terrain</h2>
+      <fieldset class="field">
+        <legend>Type de relief</legend>
+        <div class="seg">
+          <label><input type="radio" name="relief" value="varie" checked><span>Varié</span></label>
+          <label><input type="radio" name="relief" value="collines"><span>Collines douces</span></label>
+          <label><input type="radio" name="relief" value="montagne"><span>Montagne escarpée</span></label>
+          <label><input type="radio" name="relief" value="cretes"><span>Longues crêtes</span></label>
+          <label><input type="radio" name="relief" value="plateaux"><span>Plateaux</span></label>
+          <label><input type="radio" name="relief" value="ile"><span>Île</span></label>
+        </div>
+        <p class="hint" id="reliefHint"></p>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Rotation de la carte</legend>
+        <div class="seg">
+          <label><input type="radio" name="rot" value="auto" checked><span>Selon la difficulté</span></label>
+          <label><input type="radio" name="rot" value="nord"><span>Nord en haut</span></label>
+          <label><input type="radio" name="rot" value="quart"><span>Quarts de tour</span></label>
+          <label><input type="radio" name="rot" value="libre"><span>Angle libre</span></label>
+        </div>
+        <p class="hint" id="rotHint"></p>
+      </fieldset>
+
+      <h2 class="group">Le paysage</h2>
+      <fieldset class="field">
+        <legend>Éléments de paysage</legend>
+        <div class="seg" id="elChips">
+          <label><input type="checkbox" name="el" value="1" checked><span>Forêts</span></label>
+          <label><input type="checkbox" name="el" value="2" checked><span>Lacs</span></label>
+          <label><input type="checkbox" name="el" value="4" checked><span>Routes</span></label>
+          <label><input type="checkbox" name="el" value="8" checked><span>Hameaux</span></label>
+          <label><input type="checkbox" name="el" value="16" checked><span>Lignes électriques</span></label>
+        </div>
+        <p class="hint" id="elHint"></p>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Conditions de vue</legend>
+        <div class="seg">
+          <label><input type="radio" name="cond" value="standard" checked><span>Standard</span></label>
+          <label><input type="radio" name="cond" value="perso"><span>Au choix</span></label>
+          <label><input type="radio" name="cond" value="hasard"><span>Au hasard</span></label>
+        </div>
+        <p class="hint" id="condHint"></p>
+      </fieldset>
+
+      <div class="subfields" id="condFields" hidden>
+        <fieldset class="field">
+          <legend>Hauteur d'observation</legend>
+          <div class="seg">
+            <label><input type="radio" name="hauteur" value="debout" checked><span>Debout</span></label>
+            <label><input type="radio" name="hauteur" value="tour"><span>Tour de 25 m</span></label>
+            <label><input type="radio" name="hauteur" value="drone"><span>Drone à 120 m</span></label>
+            <label><input type="radio" name="hauteur" value="hasard"><span>Au hasard</span></label>
+          </div>
+          <p class="hint">Plus on est haut, plus on voit loin, et plus c'est facile.</p>
+        </fieldset>
+        <fieldset class="field">
+          <legend>Brume</legend>
+          <div class="seg">
+            <label><input type="radio" name="brume" value="claire"><span>Temps clair</span></label>
+            <label><input type="radio" name="brume" value="legere" checked><span>Légère</span></label>
+            <label><input type="radio" name="brume" value="epaisse"><span>Épaisse</span></label>
+            <label><input type="radio" name="brume" value="hasard"><span>Au hasard</span></label>
+          </div>
+          <p class="hint">Une brume épaisse efface les reliefs au-delà de 700 m environ.</p>
+        </fieldset>
+        <fieldset class="field">
+          <legend>Moment de la journée</legend>
+          <div class="seg">
+            <label><input type="radio" name="heure" value="matin"><span>Matin</span></label>
+            <label><input type="radio" name="heure" value="midi"><span>Midi</span></label>
+            <label><input type="radio" name="heure" value="apresmidi" checked><span>Après-midi</span></label>
+            <label><input type="radio" name="heure" value="soir"><span>Soir</span></label>
+            <label><input type="radio" name="heure" value="hasard"><span>Au hasard</span></label>
+          </div>
+          <p class="hint">Un soleil bas fait ressortir les reliefs, à midi il les écrase.</p>
+        </fieldset>
+        <fieldset class="field">
+          <legend>Saison</legend>
+          <div class="seg">
+            <label><input type="radio" name="saison" value="ete" checked><span>Été</span></label>
+            <label><input type="radio" name="saison" value="automne"><span>Automne</span></label>
+            <label><input type="radio" name="saison" value="hiver"><span>Hiver</span></label>
+            <label><input type="radio" name="saison" value="hasard"><span>Au hasard</span></label>
+          </div>
+          <p class="hint">En hiver, la neige efface les couleurs du sol et les lacs gèlent.</p>
+        </fieldset>
+      </div>
+
+      <h2 class="group">Les règles</h2>
+      <fieldset class="field">
+        <legend>Pression</legend>
+        <div class="seg">
+          <label><input type="radio" name="pression" value="aucune" checked><span>Aucune</span></label>
+          <label><input type="radio" name="pression" value="niveau"><span>Chrono par niveau</span></label>
+          <label><input type="radio" name="pression" value="global"><span>Contre-la-montre</span></label>
+          <label><input type="radio" name="pression" value="mort"><span>Mort subite</span></label>
+        </div>
+        <p class="hint" id="pressHint"></p>
+      </fieldset>
+
+      <fieldset class="field" id="tlimField" hidden>
+        <legend>Temps par niveau</legend>
+        <div class="seg">
+          <label><input type="radio" name="tlim" value="20"><span>20&nbsp;s</span></label>
+          <label><input type="radio" name="tlim" value="45" checked><span>45&nbsp;s</span></label>
+          <label><input type="radio" name="tlim" value="90"><span>90&nbsp;s</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field" id="retryField">
+        <legend>Après une erreur</legend>
+        <div class="seg">
+          <label><input type="radio" name="retry" value="nouveau" checked><span>Nouveau terrain</span></label>
+          <label><input type="radio" name="retry" value="meme"><span>Même terrain</span></label>
+        </div>
+        <p class="hint" id="retryHint"></p>
+      </fieldset>
+
+      <h2 class="group">Le code de partie</h2>
+      <div class="field">
+        <div class="field-head"><label for="seedCode">Graine et réglages</label></div>
+        <div class="code-row">
+          <input id="seedCode" class="code" spellcheck="false" autocomplete="off" autocapitalize="characters" maxlength="20" aria-describedby="seedHint">
+          <button type="button" class="btn small" id="seedCopy">Copier le code</button>
+          <button type="button" class="btn small" id="seedLink">Copier le lien</button>
+          <button type="button" class="btn small ghost" id="seedNew">Nouvelle graine</button>
+        </div>
+        <p class="hint" id="seedHint"></p>
+      </div>
+
+      <p class="howto"><strong>Comment lire la vue.</strong> Vous êtes debout, à hauteur d'yeux, face à la direction indiquée (en extrême, elle n'est pas donnée). La flèche N de la carte montre le nord&nbsp;: il n'est pas toujours en haut, ni même droit. L'écart entre deux courbes est indiqué sous l'échelle.</p>
+
+      <div><button id="startBtn" class="btn primary">Lancer la partie</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Jeu ============ -->
+<section id="game" class="wrap game" hidden>
+  <header class="hud">
+    <div class="hud-level"><strong id="hudLevel">Niveau 1</strong><span id="hudOf">sur 5</span><em id="hudDiff" class="diff-tag">Facile</em><em id="hudRelief" class="diff-tag relief-tag">Collines douces</em></div>
+    <ol class="pips" id="pips" aria-hidden="true"></ol>
+    <div class="hud-stats"><span id="hudTry">Essai <b>1</b></span><span><span id="hudTimeLbl">Temps</span> <b id="hudTime" class="num">0:00</b></span></div>
+    <button id="quitBtn" class="btn small ghost">Abandonner</button>
+    <div class="clock" id="clock" hidden aria-hidden="true"><i id="clockBar"></i></div>
+  </header>
+
+  <div class="board">
+    <figure class="view">
+      <div class="view-frame" id="viewFrame">
+        <canvas id="gl"></canvas>
+        <div class="facing" id="facing">Vous regardez vers le <b>nord</b></div>
+        <div class="loading" id="loading" hidden>Génération du terrain…</div>
+      </div>
+      <figcaption id="viewCap">Vue à hauteur d'yeux depuis un endroit de la carte.</figcaption>
+    </figure>
+
+    <div class="mapcol">
+      <div class="map-frame" id="mapFrame"><svg id="map" viewBox="0 0 1000 1000" role="img" aria-label="Carte topographique"></svg></div>
+      <div class="map-legend" id="mapLegend" hidden></div>
+      <p class="map-hint" id="mapHint">Touchez le point où vous vous trouvez.</p>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" hidden aria-live="polite">
+        <p id="fbText"></p>
+        <button id="fbBtn" class="btn small"></button>
+        <div class="fb-bar"><i id="fbBar"></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Statistiques ============ -->
+<section id="stats" class="wrap stats" hidden>
+  <div class="stats-head">
+    <p class="rank" id="rank"></p>
+    <h2><span class="num" id="score">0</span><small>points</small></h2>
+    <p id="statsSummary"></p>
+  </div>
+  <div class="share">
+    <p>Code de cette partie<strong id="runCode"></strong></p>
+    <button type="button" id="runCopy" class="btn small">Copier le code</button>
+    <button type="button" id="runLink" class="btn small">Copier le lien</button>
+    <p class="hint" id="runHint">Le lien ouvre directement ces terrains et ces réglages. Le code, lui, se colle sur l'accueil.</p>
+  </div>
+  <dl class="figures" id="figures"></dl>
+  <div class="charts" id="charts"></div>
+  <div class="split">
+    <div><h3>Par difficulté</h3><div class="table-wrap"><table id="byDiff"></table></div></div>
+    <div><h3>Par relief</h3><div class="table-wrap"><table id="byRelief"></table></div></div>
+    <div><h3>Par orientation</h3><div class="table-wrap"><table id="byOri"></table></div></div>
+  </div>
+  <div>
+    <h3>Détail des niveaux</h3>
+    <div class="table-wrap"><table id="levelTable"></table></div>
+  </div>
+  <div class="actions">
+    <button id="replayBtn" class="btn primary">Nouveaux terrains, mêmes réglages</button>
+    <button id="sameBtn" class="btn">Rejouer ces terrains</button>
+    <button id="menuBtn" class="btn">Changer les réglages</button>
+  </div>
+</section>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
